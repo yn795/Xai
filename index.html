@@ -1,48 +1,42 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Open Q1-Q7 URLs</title>
+    <title>Open URLs</title>
 </head>
 <body>
-    <h1>Open Q1-Q7 URLs from Sheet 4</h1>
-    <button id="openUrls">Fetch and Open URLs</button>
+    <h1>Fetch and Open Q1-Q7 URLs</h1>
+    <button id="fetchUrls">Open URLs</button>
 
     <script>
-        document.getElementById("openUrls").addEventListener("click", async () => {
-            // 修正されたURL（CSV形式のリンク）
+        document.getElementById("fetchUrls").addEventListener("click", async () => {
             const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSII5DclqX4l665I23Gc4zW8A3pTIrnxzZB5GTKJTF-P5WEoHE0-doHNG8N3JcxYsOokApWwQib94hH/pub?output=csv";
 
             try {
                 const response = await fetch(csvUrl);
-
-                // サーバーエラー時
                 if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                    alert(`Failed to fetch data: ${response.status}`);
+                    return;
                 }
 
-                const csvText = await response.text();
+                const csvData = await response.text();
+                const rows = csvData.split("\n");
+                const urls = rows.slice(1, 8).map(row => {
+                    const columns = row.split(",");
+                    return columns[16]?.trim(); // Q列 (16番目)
+                }).filter(url => url?.startsWith("http"));
 
-                // CSVデータを解析
-                const rows = csvText.split("\n");
-                const urls = [];
-                for (let i = 1; i <= 7; i++) { // Q1〜Q7
-                    const columns = rows[i]?.split(",");
-                    if (columns && columns[16]?.startsWith("http")) { // Q列（16番目）の値を取得
-                        urls.push(columns[16].trim());
-                    }
-                }
-
-                // URLを新しいウィンドウで開く
                 if (urls.length > 0) {
-                    urls.forEach(url => window.open(url, "_blank"));
+                    urls.forEach(url => {
+                        window.open(url, "_blank");
+                    });
                 } else {
-                    alert("No URLs found in Q1-Q7.");
+                    alert("No valid URLs found in Q1-Q7.");
                 }
             } catch (error) {
-                console.error("Error fetching or parsing the spreadsheet:", error);
-                alert("An error occurred while fetching the URLs. Check the console for more details.");
+                console.error("Error fetching or parsing CSV data:", error);
+                alert("An error occurred. Check the console for details.");
             }
         });
     </script>
