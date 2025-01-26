@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -11,9 +11,17 @@
 
     <script>
         document.getElementById("openUrls").addEventListener("click", async () => {
-            const csvUrl = "https://docs.google.com/spreadsheets/d/10u9LSMvfJEV_i9RbB-ATTT7QZxdBcjTergfxygQQ4Dc/export?format=csv&gid=13109027"; // シート4のCSV形式URL
+            // 修正されたURL（CSV形式のリンク）
+            const csvUrl = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSII5DclqX4l665I23Gc4zW8A3pTIrnxzZB5GTKJTF-P5WEoHE0-doHNG8N3JcxYsOokApWwQib94hH/pub?output=csv";
+
             try {
                 const response = await fetch(csvUrl);
+
+                // サーバーエラー時
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+
                 const csvText = await response.text();
 
                 // CSVデータを解析
