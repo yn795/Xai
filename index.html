@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Open Q1-Q7 URLs</title>
+</head>
+<body>
+    <h1>Open Q1-Q7 URLs from Sheet 4</h1>
+    <button id="openUrls">Fetch and Open URLs</button>
+
+    <script>
+        document.getElementById("openUrls").addEventListener("click", async () => {
+            const csvUrl = "https://docs.google.com/spreadsheets/d/10u9LSMvfJEV_i9RbB-ATTT7QZxdBcjTergfxygQQ4Dc/export?format=csv&gid=13109027"; // シート4のCSV形式URL
+            try {
+                const response = await fetch(csvUrl);
+                const csvText = await response.text();
+
+                // CSVデータを解析
+                const rows = csvText.split("\n");
+                const urls = [];
+                for (let i = 1; i <= 7; i++) { // Q1〜Q7
+                    const columns = rows[i]?.split(",");
+                    if (columns && columns[16]?.startsWith("http")) { // Q列（16番目）の値を取得
+                        urls.push(columns[16].trim());
+                    }
+                }
+
+                // URLを新しいウィンドウで開く
+                if (urls.length > 0) {
+                    urls.forEach(url => window.open(url, "_blank"));
+                } else {
+                    alert("No URLs found in Q1-Q7.");
+                }
+            } catch (error) {
+                console.error("Error fetching or parsing the spreadsheet:", error);
+                alert("An error occurred while fetching the URLs. Check the console for more details.");
+            }
+        });
+    </script>
+</body>
+</html>
